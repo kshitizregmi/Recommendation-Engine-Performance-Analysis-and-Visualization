@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Engine Working Analysis</title>
+    <style>
+.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+.container {
+  display: flex;
+  justify-content: space-around;
+}
+  </style>
+</head>
+<body>
+    <h1>Click one Button to visulize Progress</h1>
+
+  <form method="post" action="/">
+
+  <div class="container">
+<span>
+  From: <br> <input type="date" name="fday" id="fday"  > <br> 
+  To:<br>  <input type="date" name="tday"  id="tday"  > <br> 
+
+  <input type="submit" value="Submit" name="Submit" class="button" />
+</span>
+</div>
+ </form>
+   <div >
+       <h2> Line Chart </h2>
+      <canvas id="chartJSContainer" height="90" ></canvas>
+   </div>
+
+   <div >
+       <h2> Bar Chart of Average Ratings </h2>
+      <canvas id="bar" height="90"></canvas>
+   </div>
+
+      <div >
+       <h2> Line Chart of Events  Collaborative </h2>
+      <canvas id="colab" height="90"></canvas>
+   </div>
+
+
+         <div >
+       <h2> Line Chart of Events Cosine Similarity  </h2>
+      <canvas id="cosine" height="90"></canvas>
+   </div>
+
+            <div >
+       <h2> Line Chart of Events of Collaborative and Cosine Similarity  </h2>
+      <canvas id="colab_cosine" height="90"></canvas>
+   </div>
+
+            <div >
+       <h2> Line Chart of Events Categorey  </h2>
+      <canvas id="cat" height="90"></canvas>
+   </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+
+<script>
+
+    var event = JSON.parse('{{ eve | tojson | safe}}'); 
+    console.log(event)
+
+
+    var dat = JSON.parse('{{ keys | tojson | safe}}'); 
+
+    // console.log(label)
+
+    labels = dat.keys
+
+    console.log(labels)
+
+
+    let obj = (attr,color) => {
+     
+          let point = {
+                  label: attr,
+                  data: event[attr]  ,
+                  lineTension: 0,
+                  fill: false,
+                  borderColor: color
+
+    }
+    return point
+  }
+
+  var colorArray = [
+
+		  '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+      '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC','#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+		  '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+		  '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+		  '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
+		  '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'];
+
+  date = event.time_ev
+
+  console.log(date)
+
+var objects = {};
+
+for (var x = 1; x <= labels.length ; x++) {
+
+  objects[x] = obj(labels[x], colorArray[x])
+}
+
+
+
+
+
+console.log(objects)
+///////////////////////////////////////////////////////////
+const plot= (date=date , speedCanvas,w,x,y,z,p,q)=> {
+
+  var speedData = {
+  labels: date,
+  datasets: [objects[w],objects[x],objects[y],objects[z],objects[p],objects[q]]
+};
+var lineChart = new Chart(speedCanvas, {
+  type: 'line',
+  data: speedData,
+  options:{
+            responsive: true,
+            maintainAspectRatio: true,
+      },
+    labels: {
+    render: 'label'
+  }
+});
+
+}
+////////////////////////////////////////////
+
+
+var speedCanvas = document.getElementById("colab");
+Chart.defaults.global.defaultFontSize = 15;
+
+plot(date,speedCanvas,1,5,9,13,17,21)
+
+
+var speedCanvas = document.getElementById("cosine");
+Chart.defaults.global.defaultFontSize = 15;
+plot(date,speedCanvas,2,6,10,14,18,22)
+
+
+var speedCanvas = document.getElementById("colab_cosine");
+Chart.defaults.global.defaultFontSize = 15;
+plot(date,speedCanvas,3,7,11,15,19,23)
+
+
+
+
+var speedCanvas = document.getElementById("cat");
+Chart.defaults.global.defaultFontSize = 15;
+plot(date,speedCanvas,4,8,12,16,20,24)
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var rating = JSON.parse('{{ rat | tojson | safe}}');
+    
+//line chart
+var speedCanvas = document.getElementById("chartJSContainer");
+Chart.defaults.global.defaultFontSize = 15;
+
+var dataFirst = {
+    label: "Collab",
+    data: rating.collab,
+    lineTension: 0,
+    fill: false,
+    borderColor: 'red'
+  };
+
+var dataSecond = {
+    label: "Cosine",
+    data: rating.cosine,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'blue'
+  };
+
+var dataThird = {
+    label: "CollabCosine",
+    data: rating.collab_cosine,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'black'
+  };
+
+var dataForth = {
+    label: "Categorey",
+    data: rating.category,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'green'
+  };
+
+var speedData = {
+  labels: rating.time,
+  datasets: [dataFirst, dataSecond , dataThird ,dataForth ]
+};
+var lineChart = new Chart(speedCanvas, {
+  type: 'line',
+  data: speedData,
+  options:{
+            responsive: true,
+            maintainAspectRatio: true,
+      },
+    labels: {
+    render: 'label'
+  }
+});
+
+
+
+var densityCanvas = document.getElementById("bar");
+Chart.defaults.global.defaultFontFamily = "Lato";
+Chart.defaults.global.defaultFontSize = 18;
+
+var Collab = {
+  label: 'Collab',
+  data: rating.collab,
+  backgroundColor: 'red' , //'rgba(153, 102, 25, 0.9)',
+  borderWidth: 1,
+//   yAxisID: "y-axis-density"
+};
+
+var cosine = {
+  label: 'Cosine',
+  data: rating.cosine ,
+  backgroundColor: 'blue',//'rgba(130, 132, 44, 0.7)',
+  borderWidth: 1,
+
+};
+
+var Collab_cosine = {
+  label: 'Collab_cosine ',
+  data: rating.collab_cosine ,
+  backgroundColor: 'black',//'rgba(0, 13, 155, 0.8)',
+  borderWidth: 1,
+
+};
+
+
+var category = {
+  label: 'Category ',
+  data: rating.category ,
+  backgroundColor:'green',// 'rgba(130, 1, 132, 0.9)',
+  borderWidth: 1,
+
+};
+
+var planetData = {
+  labels: rating.time,
+  datasets: [Collab, cosine ,Collab_cosine ,category  ]
+};
+
+var chartOptions = {
+
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+    ticks: {
+        beginAtZero: true
+    }
+}]
+
+  }
+};
+var barChart = new Chart(densityCanvas, {
+  type: 'bar',
+  data: planetData,
+
+options:chartOptions
+});
+
+</script>
+</body>
+</html>
+
+
+<!-- // options:{
+// responsive: true,
+// maintainAspectRatio: false,
+// },
+// labels: {
+// render: 'label'
+// } -->

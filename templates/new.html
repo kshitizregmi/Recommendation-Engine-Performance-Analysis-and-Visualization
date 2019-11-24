@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <style>
+            table,
+            th,
+            td {
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-6">
+                    <h1>Saved</h1>
+                    <div style="height: 60vh; overflow-y:scroll;" id="save">
+                        <table id="saves">
+                            <tr>
+                                <th>Post id</th>
+                                <th>Hits</th>
+                                <th>Title</th>
+                            </tr>
+                        </table>
+                        <button type="button" onclick="upCount()" id="save-button">More</button>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h1>UnSaved</h1>
+
+                    <div style="height: 60vh; overflow-y:scroll;" id="unsave">
+                        <table id="unsaves">
+                            <tr>
+                                <th>Post id</th>
+                                <th>Hits</th>
+                                <th>Title</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <button type="button" onclick="upCount()" id="unsave-button">More</button>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h1>Relevent</h1>
+
+                    <div style="height: 60vh; overflow-y:scroll;" id="relevent">
+                        <table id="relevents">
+                            <tr>
+                                <th>Post id</th>
+                                <th>Hits</th>
+                                <th>Title</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <button type="button" onclick="upCount()" id="relevent-button">More</button>
+
+                </div>
+                <div class="col-6">
+                    <h1>Not Relevent</h1>
+
+                    <div style="height: 60vh; overflow-y:scroll;" id="notrelevent">
+                        <table id="notrelevents">
+                            <tr>
+                                <th>Post id</th>
+                                <th>Hits</th>
+                                <th>Title</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <button type="button" onclick="upCount()" id="notrelevent-button">More</button>
+
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-6">
+                    <h1>View</h1>
+                    <div style="height: 60vh; overflow-y:scroll;" id="view">
+                        <table id="views">
+                            <tr>
+                                <th>Post id</th>
+                                <th>Hits</th>
+                                <th>Title</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <button type="button" onclick="upCount()" id="view-button">More</button>
+
+                </div>
+                <div class="col-6">
+                    <h1>Official Link</h1>
+
+                    <div style="height: 60vh; overflow-y:scroll;" id="off">
+                        <table id="offs">
+                            <tr>
+                                <th>Post id</th>
+                                <th>Hits</th>
+                                <th>Title</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <button type="button" onclick="upCount()" id="off-button">More</button>
+
+                </div>
+            </div>
+        </div>
+        <!-- <div style="height: 50%; width: 50%; overflow: scroll; display: inline-block;margin: 2px">
+
+
+        </div> -->
+
+        <!-- <div style="height: 50%; width: 50%; overflow: scroll; display: inline-block;margin: 2px">
+
+        </div> -->
+
+        <!-- <div style="height: 50%; width: 50%; overflow: scroll; display: inline-block;margin: 2px">
+
+        </div>
+        <div style="height: 50%; width: 50%; overflow: scroll; display: inline-block;margin: 2px">
+
+
+        </div>
+        <div style="height: 50%; width: 50%; overflow: scroll; display: inline-block;margin: 2px">
+
+
+        </div>
+
+        <div style="height: 50%; width: 50%; overflow: scroll; display: inline-block;margin: 2px">
+
+            
+        </div> -->
+        <script>
+            ////////////////////////
+            var n_rel = JSON.parse('{{ n_rel | tojson | safe}}');
+            console.log(n_rel)
+            var offlink = JSON.parse('{{ offlink | tojson | safe}}');
+            var relevent = JSON.parse('{{ relevent | tojson | safe}}');
+            var saves = JSON.parse('{{ saves | tojson | safe}}');
+            var unsaves = JSON.parse('{{ unsaves | tojson | safe}}');
+            var viewes = JSON.parse('{{ viewes | tojson | safe}}');
+            console.log(viewes);
+
+            const unsaved = document.getElementById("unsave-button");
+            const saved = document.getElementById("save-button");
+            const releventd = document.getElementById("relevent-button");
+            const notreleventd = document.getElementById("notrelevent-button");
+            const viewd = document.getElementById("view-button");
+            const offlinkd = document.getElementById("off-button");
+            list = [n_rel.eventType[0], offlink.eventType[0], relevent.eventType[0], saves.eventType[0], unsaves.eventType[0], viewes.eventType[0]]
+
+            let notrelx = []
+            let notrely = []
+            let offx = []
+            let offy = []
+            let relx = []
+            let rely = []
+            let savex = []
+            let savey = []
+            let unsavex = []
+            let unsavey = []
+            let vx = []
+            let vy = []
+            let notreltit = []
+            let offtit = []
+            let reltit = []
+            let savetit = []
+            let unsavetit = []
+            let vt = []
+            list.forEach(i => {
+                console.log(i)
+                switch (i) {
+                    case 'NOT_RELEVANT':
+                        notrelx = n_rel.id
+                        notrely = n_rel.hits
+                        notreltit = n_rel.title
+                        console.log(notrelx)
+                        console.log(notrely)
+                        console.log(notreltit)
+                        break;
+
+                    case 'OFFICIAL_LINK':
+                        offx = offlink.id
+                        offy = offlink.hits
+                        offtit = offlink.title
+                        console.log(offx)
+                        console.log(offy)
+                        console.log(offtit)
+                        break;
+
+                    case 'RELEVANT':
+                        relx = relevent.id
+                        rely = relevent.hits
+                        reltit = relevent.title
+                        console.log(relx)
+                        console.log(rely)
+                        console.log(reltit)
+                        break;
+
+                    case 'SAVE':
+                        savex = saves.id
+                        savey = saves.hits
+                        savetit = saves.title
+                        console.log(savex)
+                        console.log(savey)
+                        console.log(savetit)
+                        break;
+                    case 'UNSAVE':
+                        unsavex = unsaves.id
+                        unsavey = unsaves.hits
+                        unsavetit = unsaves.title
+                        console.log(unsavex)
+                        console.log(unsavey)
+                        console.log(unsavetit)
+                        break;
+
+                    case 'VIEWED':
+                        vx = viewes.id
+                        vy = viewes.hits
+                        vt = viewes.title
+                        console.log(vx)
+                        console.log(vy)
+                        console.log(vt)
+                        break;
+                    default:
+                        console.log('Sorry, we are out of cases');
+                        break;
+                }
+
+            })
+
+
+            // for (let index = 0; index < det.length; index++) {
+            //     let element = det[index][0];
+            //     console.log(element)
+
+            //     switch (element) {
+            //         case 'NOT_RELEVANT':
+            //             notrelx = det[index][1]
+            //             notrely = det[index][2]
+            //             console.log(notrelx)
+            //             console.log(notrely)
+            //             break;
+
+            //         case 'OFFICIAL_LINK':
+            //             offx = det[index][1]
+            //             offy = det[index][2]
+            //             console.log(offx)
+            //             console.log(offy)
+            //             break;
+
+            //         case 'RELEVANT':
+            //             relx = det[index][1]
+            //             rely = det[index][2]
+            //             console.log(relx)
+            //             console.log(rely)
+            //             break;
+
+            //         case 'SAVE':
+            //             savex = det[index][1]
+            //             savey = det[index][2]
+            //             console.log(savex)
+            //             console.log(savey)
+            //             break;
+            //         case 'UNSAVE':
+            //             unsavex = det[index][1]
+            //             unsavey = det[index][2]
+            //             console.log(unsavex)
+            //             console.log(unsavey)
+            //             break;
+
+            //         case 'VIEWED':
+            //             vx = det[index][1]
+            //             vy = det[index][2]
+            //             console.log(vx)
+            //             console.log(vy)
+            //             break;
+            //         default:
+            //             console.log('Sorry, we are out of cases');
+            //             break;
+            //     }
+
+            //     console.log(element)
+
+            // }
+
+
+
+            class run_program {
+                constructor(x, y, z) {
+                    this.initialCount = 0
+                    this.displayCount = 10
+                    this.x = x;
+                    this.y = y;
+                    this.z = z;
+
+                }
+                increment() {
+                    this.initialCount = this.displayCount;
+                    this.displayCount = this.displayCount + 10;
+                    console.log(this.initialCount)
+                    console.log(this.displayCount)
+                }
+                displaycontent = (initialCount, displayCount, tableid) => {
+                    var table = document.getElementById(tableid);
+                    for (let index = initialCount; index < displayCount; index++) {
+                        var row = table.insertRow(-1);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        var cell3 = row.insertCell(2);
+                        cell1.innerHTML = this.x[index];
+                        cell2.innerHTML = this.y[index];
+                        cell3.innerHTML = this.z[index];
+                    }
+                }
+
+                name = (tableid, btn) => {
+                    if (this.x.length < this.displayCount) {
+                        this.displayCount = this.x.length
+                        this.displaycontent(this.initialCount, this.displayCount, tableid);
+                        btn.style.visibility = "hidden";
+                    } else {
+                        this.displaycontent(this.initialCount, this.displayCount, tableid);
+                    }
+                }
+            }
+
+            const save_d = new run_program(savex, savey, savetit, savetit);
+            save_d.name('saves', saved)
+            saved.onclick = function () {
+                save_d.increment()
+                save_d.name('saves', saved)
+
+            };
+            const unsave_d = new run_program(unsavex, unsavey, unsavetit);
+            unsave_d.name('unsaves', unsaved) //unsaves = table id
+            unsaved.onclick = function () {
+                unsave_d.increment()
+                unsave_d.name('unsaves', unsaved)
+            };
+
+            const relevent_d = new run_program(relx, rely, reltit);
+            relevent_d.name('relevents', releventd)
+            releventd.onclick = function () {
+                relevent_d.increment()
+                relevent_d.name('relevents', releventd)
+            };
+
+            const notrelevent_d = new run_program(notrelx, notrely, notreltit);
+            notrelevent_d.name('notrelevents', notreleventd)
+            notreleventd.onclick = function () {
+                notrelevent_d.increment()
+                notrelevent_d.name('notrelevents', notreleventd)
+            };
+
+
+            const viewed_d = new run_program(vx, vy, vt);
+            viewed_d.name('views', viewd)
+            viewd.onclick = function () {
+                viewed_d.increment()
+                viewed_d.name('views', viewd)
+            };
+
+            const off_d = new run_program(offx, offy, offtit);
+            off_d.name('offs', offlinkd)
+            offlinkd.onclick = function () {
+                off_d.increment()
+                off_d.name('offs', offlinkd)
+            };
+
+        </script>
+    </body>
+
+</html>
