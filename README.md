@@ -20,6 +20,7 @@ If recommendation engine do not generate any recommendation (In worst case) we r
 4.	CSS
 5.	Javascript
 6.	Chart.Js
+7.  Flask
 
 ## Database Used
 
