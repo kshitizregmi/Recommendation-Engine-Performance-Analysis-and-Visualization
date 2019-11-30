@@ -1,9 +1,9 @@
-# Project:
+# Project
 
 Recommendation system/Engine Performance analysis and Visualization.
 
 ## 
-## Description about Recommendation System:
+## Description about Recommendation System
 
 Recommendation system used is a hybrid system that works with algorithm called Single Value Decomposition (SVD), and Cosine Similarity (= Bag of words). 
 
@@ -13,7 +13,7 @@ We do data cleaning and use recommendation system to predict best possible oppor
 
 If recommendation engine do not generate any recommendation (In worst case) we recommend only those opportunity of selected category with latest deadlines. If recommendation engine generates the recommendation we append those opportunity of selected category with latest deadlines, with recommended opportunity.
 
-## Technology Used:
+## Technology Used
 1.	Python
 2.	Pandas 
 3.	HTML 
@@ -21,11 +21,11 @@ If recommendation engine do not generate any recommendation (In worst case) we r
 5.	Javascript
 6.	Chart.Js
 
-## Database Used:
+## Database Used
 
 •	MongoDB
 
-## Files:
+## Files
 1.	visu_analysis.py
 
 2.	visu_api.py
@@ -183,4 +183,11 @@ It uses visualizegraph.html to render html template and plot graph using chart.j
 
 This file contains all the database query for this project. I have used MongoDB database.
 
+## Output
+
+The output of this project is on file:
+
+- Engine Working Analysis.pdf
+
+- trend.pdf
 
