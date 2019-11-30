@@ -20,27 +20,31 @@ def filter(df):
     if df.empty:
         return  
     else:
-        df.pop('_id')
-        df.pop('__v')
-        df.sort_values( by=['time'] , ascending  = False,inplace=True)
-        df.pop('time')
-        df.drop_duplicates(keep='first',inplace=True)
+        df.pop('_id') # pop column name _id
+        df.pop('__v') #pop column name __v
+        df.sort_values( by=['time'] , ascending  = False,inplace=True) # sort dataframe by time
+        df.pop('time') # pop time columan of dataframe
+        df.drop_duplicates(keep='first',inplace=True) # delete duplicate rows of dataframe keep first delete other
         #print(df)
-        dups_evn = df.pivot_table(index=['eventType'], aggfunc='size')
-        df = pd.DataFrame(dups_evn , columns=['repi'])
-        df.reset_index(level=0, inplace=True)
+        dups_evn = df.pivot_table(index=['eventType'], aggfunc='size') # count number of events occuring in dataframe 
+        df = pd.DataFrame(dups_evn , columns=['repi']) #make dataframe with event type and its repition
+        df.reset_index(level=0, inplace=True) # reset index of datafrme
         return df
 
+# if dataframe empty add occurance values of event to 0 else find occurance of event in number (set operation to delete duplication)
 def events_agg(df):
     if df.empty:
         df['eventType'] = ["SAVE","OFFICIAL_LINK","VIEWED","UNSAVE","RELEVANT",'NOT_RELEVANT']
         df["repi"] = [0,0,0,0,0,0]
     resp = {}
     a =  ["SAVE","OFFICIAL_LINK","VIEWED","UNSAVE","RELEVANT",'NOT_RELEVANT']
-    b = list(df['eventType'])
-    A = set(a)
-    B = set(b)
-    C = list(A-B)
+    b = list(df['eventType']) # list all event type
+    print("b")
+    print(b)
+    A = set(a) 
+    B = set(b) # find only unique event type 
+
+    C = list(A-B)  # delete all intersectioin with a 
     value = [0 for i in range(len(C))]
     dis = dict(zip(C,value))
     df_json = df.to_dict('records')
@@ -49,11 +53,13 @@ def events_agg(df):
         val = row.get('repi')
         resp.update({attr:val})
     resp.update(dis)
+    print("resp")
+    print(resp)
     return resp 
 
 
 today =datetime.datetime.today()
-ke = recommendation()
+ke = recommendation() 
 uids=[]
 collab=[]
 cosine = []
@@ -79,7 +85,7 @@ cl = []
 cs=[] #cosine 
 cca =[] #collab + cosines all
 apis =[] #api ids data
-date_db =[]
+# date_db =[]
 
 for i in range(len(uids)):
     user_events_colloab = user_events(collab[i],uids[i])  
@@ -121,7 +127,7 @@ events=[{
     "colab_cosine_event":cc_r,
     "categories":c_r,
 }]
-print(events)
+# print(events)
 # insert_event(events)
 
 
@@ -130,7 +136,7 @@ clr = []
 csr=[] #cosine 
 ccar =[] #collab + cosines all
 apisr =[] #api ids data
-date_dbr =[]
+# date_dbr =[]
 
 for i in range(len(uids)):
     user_rating_colloab = user_rating(collab[i],uids[i])
@@ -153,10 +159,10 @@ flattened_list_collabr = list_only(apisr)
 api_rate = pd.DataFrame(flattened_list_collabr)
 
 #find average of all dataframe 
-ratings_average_collab =average(collab_rate)
-ratings_average_cosine = average(cosine_rate)
-ratings_average_collabCosine = average(collab_cosine_rate)
-ratings_average_catrate = average(api_rate)
+ratings_average_collab =average(collab_rate) #average of colloborative filter
+ratings_average_cosine = average(cosine_rate) #average of cosine
+ratings_average_collabCosine = average(collab_cosine_rate) #average of colloborative filter + cosine
+ratings_average_catrate = average(api_rate) # #average of category
 
 ############# Insert yesterday recomended events to database collection named analysis
 
@@ -168,6 +174,8 @@ dataset = [{
         'ratings_average_collabCosine':ratings_average_collabCosine,
         'ratings_average_category':ratings_average_catrate
         }]
+
+# print(dataset)
 
 # rate_insert(dataset)
 

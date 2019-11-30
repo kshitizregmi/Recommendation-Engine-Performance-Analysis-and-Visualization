@@ -9,9 +9,10 @@ db=conn()
 event= db['posts']
 
 #define function necessary
+# calculate id occurance for trend
 def calculate_id_occurence(df):
     obj=[]
-    event = list(df.eventType.unique())
+    event = list(df.eventType.unique()) 
     s=[]
     for i in range(len(event)):
         s=[]
@@ -23,14 +24,15 @@ def calculate_id_occurence(df):
         s= list(zip(*p))
         tmp = {"type":event[i],"postid":list(s[0]) ,"hits":list(s[1]) }
         obj.append(tmp)
+        # return json of event type post id and no of hits on that post id
     return obj
 
-#find id and title of givsen array of post ids
+#find id and title of given array of post ids
 def search_title(array):
     x = event.find({"id":{"$in":array}},{"title":1,"id":1})
     return list(x)
 
-# dataframe decomposition
+# dataframe decomposition and make new dataframe with id its event type and no of hits 
 def break_df(x,i):
     pid = x.iloc[i].pid
     et = x.iloc[i].eventType
@@ -50,7 +52,7 @@ def Joindf(x,y):
     df = notrel.drop_duplicates(keep='first')
     return df
 
-
+# return json of id its event type no of hits on that id and its title 
 def data(df):
     notrelv = {
     "id":list(df.id),
@@ -62,16 +64,12 @@ def data(df):
 
 
 
-
-
-
-
 @app.route('/', methods=['POST','GET'])
 def index():
     print(request.method)
     if  request.method == 'GET':
 
-        isodate = datetime.datetime.now()-timedelta(days = 17)
+        isodate = datetime.datetime.now()-timedelta(days = 25)
         isodate2 = datetime.datetime.now()
         
     else:
@@ -87,6 +85,9 @@ def index():
             isodate2 = datetime.datetime.strptime(t_day,'%Y-%m-%d')
     time_ev = time(isodate ,isodate2)
 
+
+# finds events at given range of datetime for different approach of recommendatiion (collaborative , cosine , collab cosine , category )
+# and post events 
     ###############################
     colab_save=event_search(isodate,isodate2,"collab.SAVE","SAVE")
     cosine_save = event_search(isodate,isodate2,"cosine.SAVE","SAVE")
@@ -118,7 +119,7 @@ def index():
     colab_cosine_UNSAVE = event_search(isodate,isodate2,"colab_cosine_event.UNSAVE","UNSAVE") 
     categories_UNSAVE =event_search(isodate,isodate2,"categories.UNSAVE","UNSAVE") 
 
-
+# put all values avobe to json with time 
     event_json = {
         "time_ev":time_ev,
 
@@ -152,14 +153,14 @@ def index():
         "cc_unsave":colab_cosine_UNSAVE,
         "cat_unsave":categories_UNSAVE
     }
-    keys =list(event_json.keys())
+    keys =list(event_json.keys()) # event_json variable keys 
 
 
     keys1={
-        "keys":keys
+        "keys":keys     # event_json variable keys in json format
     }
     
-    rates = rate_time(isodate,isodate2)
+    rates = rate_time(isodate,isodate2) # find rating for given date range
 
     time_event = []
     collab_rate=[]
@@ -167,12 +168,12 @@ def index():
     collab_cosine_rate =[]
     category_rate = []
     for i in range(len(rates)):
-        time_event.append(rates[i]['time'])
-        collab_rate.append(rates[i]['ratings_average_collab'])
-        cosine_rate.append(rates[i]['ratings_average_cosine'])
-        collab_cosine_rate.append(rates[i]['ratings_average_collabCosine'])
-        category_rate.append(rates[i]['ratings_average_category'])
-
+        time_event.append(rates[i]['time']) # find all the date in database of given range of date
+        collab_rate.append(rates[i]['ratings_average_collab']) # find average rating of colloborative for given range of date from database
+        cosine_rate.append(rates[i]['ratings_average_cosine'])  # find average rating of cosine for given range of date from database
+        collab_cosine_rate.append(rates[i]['ratings_average_collabCosine']) # find average rating of colloborative + coine for given range of date from database
+        category_rate.append(rates[i]['ratings_average_category']) # find average rating of category for given range of date from database
+# make json of each value 
     rate_json = {
         "time":time_event,
         "collab":collab_rate,
@@ -180,13 +181,14 @@ def index():
         "collab_cosine":collab_cosine_rate,
         "category": category_rate
     }
-
-    return render_template('vis.html',eve =  event_json ,rat = rate_json , keys=keys1 )
+# throw all values in vis.html template to render/ plot
+    return render_template('visualizegraph.html',eve =  event_json ,rat = rate_json , keys=keys1 )
 
 
 
 @app.route('/trend', methods=['GET'])
 def trend():
+    # delete duplicate event data and calculate their occurance 
     print(request.method)
     df= pd.DataFrame(f_events())
     df.pop('_id')
@@ -198,11 +200,15 @@ def trend():
     df.sort_values(by=['eventType','postId'] , ascending  = True ,inplace=True)
     details = calculate_id_occurence(df)
 
+    print(details)
     li =[]
     for i in range(len(details)):
         li.append(list(details[i].values()))
 
     x = pd.DataFrame(li,columns=['eventType','pid','hits'])
+
+    # dataframe(x)  decomposition and make new dataframe with id its event type and no of hits 
+
     NOT_RELEVANT = break_df(x,0)
     OFFICIAL_LINK = break_df(x,1)
     RELEVANT = break_df(x,2)
@@ -217,6 +223,8 @@ def trend():
         x = search_title(list_of_postid[i])
         tem.append(x)
 
+#   list of list to list
+    print(tem)
     flatno = [y for x in tem for y in x]
     idtitle = pd.DataFrame(flatno)
     idtitle.pop('_id')
@@ -229,6 +237,8 @@ def trend():
 
     new = [y for x in KEY_VAL for y in x]
     all_df = pd.DataFrame(new)
+
+    # inner join two dataframe  and make one 
     notrel = Joindf(NOT_RELEVANT,all_df )
     off = Joindf(OFFICIAL_LINK,all_df )
     rel = Joindf(RELEVANT,all_df )
@@ -236,13 +246,14 @@ def trend():
     unsave = Joindf(UNSAVE,all_df )
     view = Joindf(VIEWED,all_df )
 
+    # return json of id its event type no of hits on that id and its title 
     n_rel = data(notrel)
     offlink = data(off)
     relevent = data(rel)
     saves = data(save)
     unsaves = data(unsave)
     viewes = data(view)
-    return render_template('new.html',n_rel =n_rel,offlink = offlink, relevent = relevent ,saves = saves, unsaves = unsaves,viewes = viewes )
+    return render_template('trend.html',n_rel =n_rel,offlink = offlink, relevent = relevent ,saves = saves, unsaves = unsaves,viewes = viewes )
 
 
 
