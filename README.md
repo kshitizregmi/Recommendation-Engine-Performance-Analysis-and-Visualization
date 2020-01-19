@@ -5,7 +5,7 @@ Recommendation system/Engine Performance analysis and Visualization.
 ## 
 ## Description about Recommendation System
 
-Recommendation system used is a hybrid system that works with algorithm called Single Value Decomposition (SVD), and Cosine Similarity (= Bag of words). 
+In this project, recommendation system used is a hybrid system that works with algorithm called Single Value Decomposition (SVD), and Cosine Similarity (= Bag of words). 
 
 User using the app selects the category of opportunity, and we track all activity that the user does, (activity like view the opportunity, save the opportunity, click relevant on that opportunity, click irrelevant on that opportunity, and visit official link of that opportunity) in that app.
 
